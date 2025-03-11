@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_DIR = "/var/lib/jenkins/workspace/build/assignment"  
+        BRANCH_NAME = "solution-divyanshukumar"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    echo "Checking out the repository..."
+                    checkout([$class: 'GitSCM', branches: [[name: BRANCH_NAME]], userRemoteConfigs: [[url: 'https://github.com/divyaanshu0/va2pt-pre-screening-assignment.git']]])
+                }
+            }
+        }
+
+        stage('Stop Existing Containers') {
+            steps {
+                script {
+                    echo "Stopping and removing existing containers..."
+                    sh "cd ${PROJECT_DIR} && docker-compose down"
+                }
+            }
+        }
+
+        stage('Build and Start Application') {
+            steps {
+                script {
+                    echo "Building and starting Docker containers..."
+                    sh "cd ${PROJECT_DIR} && docker-compose up --build -d"
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    echo "Checking running containers..."
+                    sh "docker ps"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment successful!"
+        }
+        failure {
+            echo "Deployment failed!"
+        }
+    }
+}
