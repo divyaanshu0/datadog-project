@@ -1,20 +1,19 @@
-# Use the official Python image from the Docker Hub
+# Use the official Python image
 FROM python:3.9
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Copy requirements and install dependencies
 COPY requirements.txt ./
-
-# Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
 
-# Command to run the FastAPI application using Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+# Expose the port Uvicorn will run on
+EXPOSE 8080
 
-# Expose the port that Uvicorn will run on
-EXPOSE 8000
+# Start the app with Datadog APM enabled
+CMD ["ddtrace-run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+

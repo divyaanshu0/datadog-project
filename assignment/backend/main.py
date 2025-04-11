@@ -1,3 +1,7 @@
+from ddtrace import patch_all
+patch_all()
+
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from database import get_db_connection
